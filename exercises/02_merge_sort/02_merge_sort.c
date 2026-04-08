@@ -13,9 +13,52 @@ typedef struct {
 Student students[MAX_STUDENTS];
 Student temp[MAX_STUDENTS];
 
+void merge(int left, int mid, int right) {
+    int i = left;      // 左半部分起始索引
+    int j = mid + 1;   // 右半部分起始索引
+    int k = left;      // 临时数组 temp 的起始索引
+
+    // 比较并合并两个有序子序列到临时数组 temp 中
+    while (i <= mid && j <= right) {
+        // 目标是从高到低排序，所以成绩大的优先放入
+        if (students[i].score >= students[j].score) {
+            temp[k++] = students[i++];
+        } else {
+            temp[k++] = students[j++];
+        }
+    }
+
+    // 将左半部分剩余的元素放入 temp
+    while (i <= mid) {
+        temp[k++] = students[i++];
+    }
+
+    // 将右半部分剩余的元素放入 temp
+    while (j <= right) {
+        temp[k++] = students[j++];
+    }
+
+    // 将排序好的 temp 数组内容复制回原数组 students
+    for (int p = left; p <= right; p++) {
+        students[p] = temp[p];
+    }
+}
+
 void merge_sort(int left, int right) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    // 递归终止条件：子序列只有一个元素时自然有序
+    if (left >= right) {
+        return;
+    }
+
+    // 找到中间位置，防止 (left+right)/2 在极端情况下溢出
+    int mid = left + (right - left) / 2;
+
+    // 分：递归地对左右两半进行排序
+    merge_sort(left, mid);
+    merge_sort(mid + 1, right);
+
+    // 治：合并两个有序序列
+    merge(left, mid, right);
 }
 
 int main(void) {
