@@ -6,8 +6,9 @@
 #include <string.h>
 
 void to_lowercase(char *str) {
-  for (; *str; ++str)
+  for (; *str; ++str) {
     *str = tolower((unsigned char)*str);
+  }
 }
 
 int main() {
@@ -24,11 +25,11 @@ int main() {
     free_hash_table(table);
     return 1;
   }
-  printf("词典加载完成，共计%ld词条。\n", dict_count);
+  printf("词典加载完成，共计%lu词条。\n", (unsigned long)dict_count);
 
-  FILE* file = fopen("text.txt", "r");
+  FILE *file = fopen("text.txt", "r");
   if (file == NULL) {
-    fprintf(stderr, "无法打开文件 dict.txt。\n");
+    fprintf(stderr, "无法打开文件 text.txt。\n");
     free_hash_table(table);
     return 1;
   }
@@ -38,14 +39,44 @@ int main() {
     line[strcspn(line, "\n")] = '\0';
 
     if (strlen(line) == 0) {
-        continue;
+      continue;
     }
 
-    // 使用 strtok 按空格分割单词
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    char *word = strtok(line, " ");
+    while (word != NULL) {
+      char normalized[256];
+      strncpy(normalized, word, sizeof(normalized) - 1);
+      normalized[sizeof(normalized) - 1] = '\0';
+      to_lowercase(normalized);
+
+      size_t start = 0;
+      while (normalized[start] != '\0' && ispunct((unsigned char)normalized[start])) {
+        start++;
+      }
+
+      size_t end = strlen(normalized);
+      while (end > start && ispunct((unsigned char)normalized[end - 1])) {
+        end--;
+      }
+
+      if (end > start) {
+        memmove(normalized, normalized + start, end - start);
+        normalized[end - start] = '\0';
+
+        const char *translation = hash_table_lookup(table, normalized);
+        printf("原文: %s\t", normalized);
+        if (translation) {
+          printf("翻译: %s\n", translation);
+        } else {
+          printf("未找到该单词的翻译。\n");
+        }
+      }
+
+      word = strtok(NULL, " ");
+    }
   }
 
+  fclose(file);
   free_hash_table(table);
   return 0;
 }

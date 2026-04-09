@@ -40,8 +40,57 @@ void processFile(const char *filename) {
     printf("=== 处理数据来自: %s ===\n", filename);
 
     switch (choice) {
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        case 1: {
+            int *array = malloc(sizeof(int) * n);
+            if (!array) {
+                printf("错误: 内存分配失败\n");
+                fclose(fin);
+                return;
+            }
+
+            for (int i = 0; i < n; i++) {
+                fscanf(fin, "%d", &array[i]);
+            }
+
+            sort(array, n, sizeof(int), compareInt);
+
+            for (int i = 0; i < n; i++) {
+                printf("%d", array[i]);
+                if (i < n - 1) {
+                    printf(" ");
+                }
+            }
+            printf("\n");
+            free(array);
+            break;
+        }
+        case 2: {
+            float *array = malloc(sizeof(float) * n);
+            if (!array) {
+                printf("错误: 内存分配失败\n");
+                fclose(fin);
+                return;
+            }
+
+            for (int i = 0; i < n; i++) {
+                fscanf(fin, "%f", &array[i]);
+            }
+
+            sort(array, n, sizeof(float), compareFloat);
+
+            for (int i = 0; i < n; i++) {
+                printf("%.2f", array[i]);
+                if (i < n - 1) {
+                    printf(" ");
+                }
+            }
+            printf("\n");
+            free(array);
+            break;
+        }
+        default:
+            printf("错误: 不支持的排序类型 %d\n", choice);
+            break;
     }
 
     fclose(fin);

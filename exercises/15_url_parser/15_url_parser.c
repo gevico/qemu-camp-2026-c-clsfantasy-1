@@ -12,8 +12,29 @@
 int parse_url(const char* url) {
     int err = 0;
 
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    const char *query = strchr(url, '?');
+    if (query == NULL || *(query + 1) == '\0') {
+        return -1;
+    }
+
+    size_t query_len = strlen(query + 1);
+    char *buffer = malloc(query_len + 1);
+    if (buffer == NULL) {
+        return -1;
+    }
+    memcpy(buffer, query + 1, query_len + 1);
+
+    char *pair = strtok(buffer, "&");
+    while (pair != NULL) {
+        char *equal = strchr(pair, '=');
+        if (equal != NULL) {
+            *equal = '\0';
+            printf("key = %s, value = %s\n", pair, equal + 1);
+        }
+        pair = strtok(NULL, "&");
+    }
+
+    free(buffer);
 
 exit:
     return err;
