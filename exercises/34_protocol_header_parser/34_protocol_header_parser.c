@@ -18,8 +18,9 @@
  * 原始协议头（与网络字节流逐字节对应，不直接使用位域跨字节）
  */
 typedef struct {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    uint16_t version_be;
+    uint16_t length_be;
+    uint8_t flags_raw;
 } proto_header_raw_t;
 
 /*
@@ -27,8 +28,11 @@ typedef struct {
  * 注意：位域在不同平台的位序实现可能不同，故此处不作为内存映射，仅用于展示语义并由解析代码赋值。
  */
 typedef struct {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    unsigned int ver_minor : 4;
+    unsigned int ver_major : 4;
+    uint16_t length;
+    unsigned int flags : 5;
+    unsigned int reserved : 3;
 } proto_header_bits_t;
 
 #pragma pack(pop)
@@ -37,8 +41,7 @@ typedef struct {
  * 将网络序（大端）的 16 位数转换为主机序
  */
 static uint16_t be16_to_cpu(uint16_t be) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    return (uint16_t)(((be & 0x00FFu) << 8) | ((be & 0xFF00u) >> 8));
 }
 
 int main(void) {
@@ -50,8 +53,9 @@ int main(void) {
     memcpy(&raw, stream, sizeof(raw));
 
     /* 解析版本号：题目定义“4 位主版本 + 4 位次版本”，位于版本字段的低 8 位 */
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    uint16_t version = be16_to_cpu(raw.version_be);
+    unsigned ver_major = (unsigned)((version >> 4) & 0x0Fu);
+    unsigned ver_minor = (unsigned)(version & 0x0Fu);
 
     /* 解析长度：网络序 16 位 */
     uint16_t length = be16_to_cpu(raw.length_be);
@@ -60,8 +64,12 @@ int main(void) {
     unsigned flags = (unsigned)(raw.flags_raw & 0x1Fu);
 
     /* 使用位域结构体表达（非内存映射，仅用于说明位域解析规则） */
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    proto_header_bits_t view = {0};
+    view.ver_major = ver_major;
+    view.ver_minor = ver_minor;
+    view.length = length;
+    view.flags = flags;
+    view.reserved = (unsigned)((raw.flags_raw >> 5) & 0x07u);
 
     /* 期望输出：version:0.3, length:32, flags:0x00 */
     printf("version:%u.%u, length:%u, flags:0x%02X\n", view.ver_major, view.ver_minor, view.length, view.flags & 0xFFu);

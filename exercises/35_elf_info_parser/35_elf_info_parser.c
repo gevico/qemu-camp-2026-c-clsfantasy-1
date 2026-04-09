@@ -38,21 +38,54 @@ static int host_is_little_endian(void) {
  * 将 ELF 头字段按需要进行字节序转换（若文件端序与主机端序不同）
  */
 static void fix_ehdr_endian(const Elf64_Ehdr *src, Elf64_Ehdr *dst, int file_is_le, int host_is_le) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    memcpy(dst, src, sizeof(*dst));
+    if (file_is_le == host_is_le) {
+        return;
+    }
+    dst->e_type = bswap16(src->e_type);
+    dst->e_machine = bswap16(src->e_machine);
+    dst->e_version = bswap32(src->e_version);
+    dst->e_entry = bswap64(src->e_entry);
+    dst->e_phoff = bswap64(src->e_phoff);
+    dst->e_shoff = bswap64(src->e_shoff);
+    dst->e_flags = bswap32(src->e_flags);
+    dst->e_ehsize = bswap16(src->e_ehsize);
+    dst->e_phentsize = bswap16(src->e_phentsize);
+    dst->e_phnum = bswap16(src->e_phnum);
+    dst->e_shentsize = bswap16(src->e_shentsize);
+    dst->e_shnum = bswap16(src->e_shnum);
+    dst->e_shstrndx = bswap16(src->e_shstrndx);
 }
 
 static void fix_phdr_endian(const Elf64_Phdr *src, Elf64_Phdr *dst, int file_is_le, int host_is_le) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    memcpy(dst, src, sizeof(*dst));
+    if (file_is_le == host_is_le) {
+        return;
+    }
+    dst->p_type = bswap32(src->p_type);
+    dst->p_flags = bswap32(src->p_flags);
+    dst->p_offset = bswap64(src->p_offset);
+    dst->p_vaddr = bswap64(src->p_vaddr);
+    dst->p_paddr = bswap64(src->p_paddr);
+    dst->p_filesz = bswap64(src->p_filesz);
+    dst->p_memsz = bswap64(src->p_memsz);
+    dst->p_align = bswap64(src->p_align);
 }
 
 static const char *etype_to_str(uint16_t e_type) {
     switch (e_type) {
         case ET_NONE: /* 无类型 */
             return "ET_NONE";
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        case ET_REL:
+            return "ET_REL";
+        case ET_EXEC:
+            return "ET_EXEC";
+        case ET_DYN:
+            return "ET_DYN";
+        case ET_CORE:
+            return "ET_CORE";
+        default:
+            return "ET_UNKNOWN";
     }
 }
 

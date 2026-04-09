@@ -8,16 +8,24 @@ void print_item(link p) { printf("%d ", p->item); }
 
 // 通过遍历拿到当前链表的头结点
 static link g_first_node = NULL;
+static link g_last_node = NULL;
 static void capture_first(link p) {
     if (g_first_node == NULL) {
         g_first_node = p;
     }
 }
+static void capture_last(link p) { g_last_node = p; }
 
 static link get_head_node(void) {
     g_first_node = NULL;
     traverse(capture_first);
     return g_first_node;
+}
+
+static link get_tail_node(void) {
+    g_last_node = NULL;
+    traverse(capture_last);
+    return g_last_node;
 }
 
 // 获取下一个节点；若到达尾部则回绕到头结点
@@ -62,20 +70,33 @@ void josephus_problem(int n, int k, int m) {
     }
 
     // 依次出列并打印顺序
+    link prev = NULL;
     for (int out = 0; out < n; ++out) {
-        if (m == 1) {
-            // m==1 时当前节点直接出列
-            // TODO: 在这里添加你的代码
-            // I AM NOT DONE
+        if (current == NULL) {
+            break;
         }
 
-        // 数到 m 的那个人出列：从 current 开始走 m-1 步，落在第 m 个节点
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        link head = get_head_node();
+        if (current == head) {
+            prev = get_tail_node();
+        }
 
-        // 此时 current 指向要出列的人
-        // TODO: 在这里添加你的代码
-        // I AM NOT DONE
+        for (int step = 1; step < m; ++step) {
+            prev = current;
+            current = next_wrap(current);
+        }
+
+        printf("%d ", current->item);
+
+        link next = current->next ? current->next : get_head_node();
+        if (current == get_head_node()) {
+            delete(current);
+            current = next == head ? get_head_node() : next;
+            prev = get_tail_node();
+        } else {
+            delete(current);
+            current = next == current ? NULL : next;
+        }
     }
 
     printf("\n");
