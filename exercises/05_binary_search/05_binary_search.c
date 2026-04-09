@@ -15,13 +15,32 @@ Student students[MAX_STUDENTS];
 int n;
 
 int binary_search(const char *target_name) {
-    // TODO: 在这里添加你的代码
-    // I AM NOT DONE
+    int left = 0;
+    int right = n - 1;
+
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        int cmp = strcmp(students[mid].name, target_name);
+
+        if (cmp == 0) {
+            return mid;
+        }
+        if (cmp < 0) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return -1;
 }
 
 int main(void) {
     // 打开文件读取已排序的学生信息
     FILE *file = fopen("05_students.txt", "r");
+    if (!file) {
+        file = fopen("exercises/05_binary_search/05_students.txt", "r");
+    }
     if (!file) {
         printf("错误：无法打开文件 05_students.txt\n");
         return 1;
